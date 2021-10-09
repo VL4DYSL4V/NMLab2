@@ -4,7 +4,9 @@ import framework.command.RunnableCommand;
 import framework.state.ApplicationState;
 import framework.state.ApplicationStateAware;
 import framework.utils.ConsoleUtils;
+import framework.utils.MatrixUtils;
 import framework.utils.ValidationUtils;
+import framework.utils.VectorUtils;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -21,7 +23,9 @@ public class GaussCommand implements RunnableCommand, ApplicationStateAware {
         ArrayRealVector vector = (ArrayRealVector) applicationState.getVariable("vector");
         ValidationUtils.requireEquals(vector.getDimension(), matrix.getRowDimension(),
                 "Vector length and matrix row count must be equal");
+        ConsoleUtils.printSystemOfLinearEquations("Before:", 2, matrix, vector);
         solve(matrix, vector);
+        ConsoleUtils.printSystemOfLinearEquations("After:", 2, matrix, vector);
     }
 
     private static void solve(Array2DRowRealMatrix matrix, ArrayRealVector vector) {
@@ -31,15 +35,6 @@ public class GaussCommand implements RunnableCommand, ApplicationStateAware {
             swapRowsOfEquation(matrix, vector, rowIndex, columnIndex);
             rowIndex = columnIndex;
             subtractRowFromOthersToMakeZeroesInColumn(matrix, vector, rowIndex, columnIndex);
-        }
-
-        printMatrix(matrix);
-        ConsoleUtils.println(vector.toString());
-    }
-
-    private static void printMatrix(RealMatrix matrix) {
-        for (int i = 0; i < matrix.getRowDimension(); i++) {
-            ConsoleUtils.println(matrix.getRowVector(i).toString());
         }
     }
 
@@ -68,16 +63,9 @@ public class GaussCommand implements RunnableCommand, ApplicationStateAware {
         vector.setEntry(rowIndex, vector.getEntry(rowIndex) / maxByModuleElement);
     }
 
-    private static void swapRowsOfEquation(RealMatrix matrix, RealVector vector, int index1, int index2){
-        RealVector row1 = new ArrayRealVector(matrix.getRowVector(index1));
-        RealVector row2 = new ArrayRealVector(matrix.getRowVector(index2));
-        matrix.setRow(index1, row2.toArray());
-        matrix.setRow(index2, row1.toArray());
-
-        double entry1 = vector.getEntry(index1);
-        double entry2 = vector.getEntry(index2);
-        vector.setEntry(index1, entry2);
-        vector.setEntry(index2, entry1);
+    private static void swapRowsOfEquation(RealMatrix matrix, RealVector vector, int index1, int index2) {
+        MatrixUtils.swapRows(matrix, index1, index2);
+        VectorUtils.swapCoordinates(vector, index1, index2);
     }
 
     private static int getIndexOfMaxByModule(Array2DRowRealMatrix matrix, int column) {
