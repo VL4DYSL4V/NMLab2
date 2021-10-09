@@ -23,9 +23,11 @@ public class GaussCommand implements RunnableCommand, ApplicationStateAware {
         ArrayRealVector vector = (ArrayRealVector) applicationState.getVariable("vector");
         ValidationUtils.requireEquals(vector.getDimension(), matrix.getRowDimension(),
                 "Vector length and matrix row count must be equal");
-        ConsoleUtils.printSystemOfLinearEquations("Before:", 2, matrix, vector);
+        ConsoleUtils.println("Before:");
+        ConsoleUtils.printSystemOfLinearEquations(2, matrix, vector);
         solve(matrix, vector);
-        ConsoleUtils.printSystemOfLinearEquations("After:", 2, matrix, vector);
+        ConsoleUtils.println("After:");
+        ConsoleUtils.printSystemOfLinearEquations(2, matrix, vector);
     }
 
     private static void solve(Array2DRowRealMatrix matrix, ArrayRealVector vector) {
