@@ -1,5 +1,6 @@
 package main;
 
+import command.DeterminantCommand;
 import command.GaussCommand;
 import command.JacobiCommand;
 import framework.application.Application;
@@ -15,6 +16,7 @@ public class Main {
         Application application = new Application.ApplicationBuilder(PROPERTY_PATH, state)
                 .addCommand("gauss", new GaussCommand())
                 .addCommand("jacobi", new JacobiCommand())
+                .addCommand("determinant", new DeterminantCommand())
                 .build();
         application.start();
     }

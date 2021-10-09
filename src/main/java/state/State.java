@@ -1,11 +1,9 @@
 package state;
 
 import framework.state.AbstractApplicationState;
-import lombok.Getter;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
-@Getter
 public class State extends AbstractApplicationState {
 
     private final Array2DRowRealMatrix matrix =
@@ -21,7 +19,7 @@ public class State extends AbstractApplicationState {
 
     @Override
     protected void initVariableNameToGettersMap() {
-        this.variableNameToGetter.put("matrix", this::getMatrix);
-        this.variableNameToGetter.put("vector", this::getVector);
+        this.variableNameToGetter.put("matrix", () -> this.matrix.copy());
+        this.variableNameToGetter.put("vector", () -> this.vector.copy());
     }
 }
