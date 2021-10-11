@@ -1,5 +1,6 @@
 package main;
 
+import command.ConditionNumberCommand;
 import command.DeterminantCommand;
 import command.GaussCommand;
 import command.JacobiCommand;
@@ -17,6 +18,7 @@ public class Main {
                 .addCommand("gauss", new GaussCommand())
                 .addCommand("jacobi", new JacobiCommand())
                 .addCommand("determinant", new DeterminantCommand())
+                .addCommand("condition-number", new ConditionNumberCommand())
                 .build();
         application.start();
     }
