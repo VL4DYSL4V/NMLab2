@@ -26,10 +26,11 @@ public class JacobiCommand implements RunnableCommand, ApplicationStateAware {
             Array2DRowRealMatrix matrix = (Array2DRowRealMatrix) applicationState.getVariable("matrix");
             ArrayRealVector vector = (ArrayRealVector) applicationState.getVariable("vector");
             ConsoleUtils.println("Before:");
-            ConsoleUtils.printSystemOfLinearEquations(4, matrix, vector);
-            solve(matrix, vector, precision);
+            ConsoleUtils.printSystemOfLinearEquations(2, matrix, vector);
+            RealVector result = solve(matrix, vector, precision);
+            final int numbersAfterPointForResult = getNumbersAfterPointForResult(precision);
             ConsoleUtils.println("After:");
-            ConsoleUtils.printSystemOfLinearEquations(4, matrix, vector);
+            ConsoleUtils.printVector(numbersAfterPointForResult, result);
         } catch (LaboratoryFrameworkException e) {
             ConsoleUtils.println(e.getMessage());
         }
@@ -41,10 +42,16 @@ public class JacobiCommand implements RunnableCommand, ApplicationStateAware {
         if (precisionAsString == null) {
             return 1e-5;
         }
-        return ConverterUtils.doubleFromString(precisionAsString);
+        double precision = ConverterUtils.doubleFromString(precisionAsString);
+        ValidationUtils.requireLesserThan(precision, 1.0, "Precision must be < 1");
+        return precision;
     }
 
-    private static void solve(RealMatrix matrix, RealVector vector, double precision) {
+    private static int getNumbersAfterPointForResult(double precision) {
+        return String.valueOf(precision).substring(2).length();
+    }
+
+    private static RealVector solve(RealMatrix matrix, RealVector vector, double precision) {
         for (int columnIndex = 0; columnIndex < matrix.getColumnDimension(); columnIndex++) {
             int rowIndex = getIndexOfMaxByModule(matrix, columnIndex);
             divideRowByMaxElement(matrix, vector, rowIndex, columnIndex);
@@ -54,11 +61,13 @@ public class JacobiCommand implements RunnableCommand, ApplicationStateAware {
         }
         RealVector constantVector = vector.copy();
         RealVector currentGuess = vector;
-        RealVector previousGuess = currentGuess;
+        RealVector previousGuess;
         do {
+            previousGuess = currentGuess;
             RealVector multiplicationResult = matrix.operate(currentGuess);
-            currentGuess = constantVector.subtract()
-        } while ();
+            currentGuess = constantVector.subtract(multiplicationResult);
+        } while (computeFault(previousGuess, currentGuess) > precision);
+        return currentGuess;
     }
 
     private static double computeFault(RealVector previousSolution, RealVector currentSolution) {
