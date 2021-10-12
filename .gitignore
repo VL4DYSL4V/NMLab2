@@ -1,0 +1,4 @@
+/src/main/resources/META-INF/
+/out/
+/.idea/
+*.iml
