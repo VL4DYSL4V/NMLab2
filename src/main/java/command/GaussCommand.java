@@ -1,6 +1,7 @@
 package command;
 
 import framework.command.RunnableCommand;
+import framework.exception.LaboratoryFrameworkException;
 import framework.state.ApplicationState;
 import framework.state.ApplicationStateAware;
 import framework.utils.ConsoleUtils;
@@ -11,6 +12,7 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
+import util.EquationCommandUtils;
 
 public class GaussCommand implements RunnableCommand, ApplicationStateAware {
 
@@ -18,11 +20,14 @@ public class GaussCommand implements RunnableCommand, ApplicationStateAware {
 
     @Override
     public void execute(String[] strings) {
+        try {
+            EquationCommandUtils.assertParametersSanity(this.applicationState);
+        } catch (LaboratoryFrameworkException e) {
+            ConsoleUtils.println(e.getMessage());
+            return;
+        }
         Array2DRowRealMatrix matrix = (Array2DRowRealMatrix) applicationState.getVariable("matrix");
-        ValidationUtils.requireEquals(matrix.getRowDimension(), matrix.getColumnDimension(), "Matrix is not square");
         ArrayRealVector vector = (ArrayRealVector) applicationState.getVariable("vector");
-        ValidationUtils.requireEquals(vector.getDimension(), matrix.getRowDimension(),
-                "Vector length and matrix row count must be equal");
         ConsoleUtils.println("Before:");
         ConsoleUtils.printSystemOfLinearEquations(2, matrix, vector);
         solve(matrix, vector);
@@ -59,7 +64,7 @@ public class GaussCommand implements RunnableCommand, ApplicationStateAware {
     private static void divideRowByMaxElement(RealMatrix matrix, RealVector vector, int rowIndex, int columnIndex) {
         RealVector row = matrix.getRowVector(rowIndex);
         double maxByModuleElement = row.getEntry(columnIndex);
-        ValidationUtils.requireNotEquals(maxByModuleElement, 0, "Column must not consist of zeroes");
+        ValidationUtils.requireNotEquals(maxByModuleElement, 0.0, "Column must not consist of zeroes");
         RealVector dividedRow = row.mapDivide(maxByModuleElement);
         matrix.setRow(rowIndex, dividedRow.toArray());
         vector.setEntry(rowIndex, vector.getEntry(rowIndex) / maxByModuleElement);
