@@ -25,11 +25,11 @@ public class JacobiCommand implements RunnableCommand, ApplicationStateAware {
             double precision = getPrecision(args);
             Array2DRowRealMatrix matrix = (Array2DRowRealMatrix) applicationState.getVariable("matrix");
             ArrayRealVector vector = (ArrayRealVector) applicationState.getVariable("vector");
-            ConsoleUtils.println("Before:");
+            ConsoleUtils.println("Equation:");
             ConsoleUtils.printSystemOfLinearEquations(2, matrix, vector);
             RealVector result = solve(matrix, vector, precision);
             final int numbersAfterPointForResult = getNumbersAfterPointForResult(precision);
-            ConsoleUtils.println("After:");
+            ConsoleUtils.println("Result:");
             ConsoleUtils.printVector(numbersAfterPointForResult, result);
         } catch (LaboratoryFrameworkException e) {
             ConsoleUtils.println(e.getMessage());
